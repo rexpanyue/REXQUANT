@@ -70,9 +70,20 @@ h1 {
 
 <div class="card">
 <h2>📈 最新股票池</h2>
-<p>更新时间：2026-02-20 15:10</p>
+<p id="updateTime"></p>
 
-<a class="button" href="latest/YL_latest.ebk" download>
+<script>
+const now = new Date();
+const formatted = now.getFullYear() + "-" +
+("0" + (now.getMonth()+1)).slice(-2) + "-" +
+("0" + now.getDate()).slice(-2) + " 15:10";
+
+document.getElementById("updateTime").innerText =
+"更新时间：" + formatted;
+</script>
+    
+
+<a class="button" href="https://raw.githubusercontent.com/rexpanvue/REXQUANT/main/latest/YL_latest.ebk" download>
 下载最新板块文件 (.EBK)
 </a>
 </div>
@@ -92,7 +103,15 @@ h1 {
 3. 选择下载文件即可查看股票池
 </p>
 </div>
+<div class="card">
+<h2>策略逻辑</h2>
+<p>
+游龙掠影基于强势结构突破、量价共振筛选日线级别潜在爆发个股。
+本阶段为测试版本，仅供策略验证。
+</p>
+</div>
 
+    
 <div class="footer">
 © 2026 游龙掠影 · 策略测试阶段
 </div>
