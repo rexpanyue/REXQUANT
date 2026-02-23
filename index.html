@@ -2,7 +2,7 @@
 <html lang="zh">
 <head>
 <meta charset="UTF-8">
-<title>游龙掠影 · 每日股票池</title>
+<title>游龙掠影 · 策略监控系统</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
@@ -11,112 +11,110 @@ body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto;
     background: #0f172a;
     color: #e2e8f0;
-    text-align: center;
 }
 
 .container {
-    max-width: 800px;
-    margin: 80px auto;
+    display: flex;
+    height: 100vh;
+}
+
+.left {
+    width: 30%;
+    background: #1e293b;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.right {
+    width: 70%;
     padding: 20px;
 }
 
 h1 {
-    font-size: 42px;
-    margin-bottom: 10px;
-    letter-spacing: 2px;
+    text-align: center;
 }
 
-.subtitle {
-    color: #94a3b8;
-    margin-bottom: 40px;
+.stock-item {
+    padding: 10px;
+    margin: 5px 0;
+    background: #334155;
+    border-radius: 6px;
+    cursor: pointer;
 }
 
-.card {
-    background: #1e293b;
-    border-radius: 12px;
-    padding: 30px;
-    margin-bottom: 30px;
-}
-
-.button {
-    display: inline-block;
-    padding: 14px 28px;
+.stock-item:hover {
     background: #22c55e;
     color: #0f172a;
-    font-weight: bold;
-    text-decoration: none;
-    border-radius: 8px;
-    margin-top: 20px;
 }
 
-.button:hover {
-    background: #16a34a;
-}
-
-.footer {
-    margin-top: 60px;
-    font-size: 14px;
-    color: #64748b;
-}
 </style>
 </head>
 
 <body>
 
+<h1 style="text-align:center;padding:10px;">游龙掠影 · 股票池实时查看</h1>
+
 <div class="container">
+<div class="left">
+<h3>股票池</h3>
+<div id="stockList">加载中...</div>
+</div>
 
-<h1>游龙掠影</h1>
-<div class="subtitle">每日策略信号 · 通达信自定义板块</div>
+<div class="right">
+<div id="tv_chart_container" style="height:100%;"></div>
+</div>
+</div>
 
-<div class="card">
-<h2>📈 最新股票池</h2>
-<p id="updateTime"></p>
+<script src="https://s3.tradingview.com/tv.js"></script>
 
 <script>
-const now = new Date();
-const formatted = now.getFullYear() + "-" +
-("0" + (now.getMonth()+1)).slice(-2) + "-" +
-("0" + now.getDate()).slice(-2) + " 15:10";
 
-document.getElementById("updateTime").innerText =
-"更新时间：" + formatted;
+function loadChart(code){
+let symbol;
+
+if(code.startsWith("6")){
+symbol = "SSE:" + code;
+}else{
+symbol = "SZSE:" + code;
+}
+
+document.getElementById("tv_chart_container").innerHTML = "";
+
+new TradingView.widget({
+"container_id": "tv_chart_container",
+"symbol": symbol,
+"interval": "D",
+"timezone": "Asia/Shanghai",
+"theme": "dark",
+"style": "1",
+"locale": "zh_CN",
+"autosize": true
+});
+}
+
+fetch("stock_list.json")
+.then(response => response.json())
+.then(data => {
+let container = document.getElementById("stockList");
+container.innerHTML = "";
+
+data.forEach(code => {
+let div = document.createElement("div");
+div.className = "stock-item";
+div.innerText = code;
+div.onclick = () => loadChart(code);
+container.appendChild(div);
+});
+
+if(data.length > 0){
+loadChart(data[0]);
+}
+})
+.catch(err => {
+document.getElementById("stockList").innerText = "无法加载股票池";
+});
+
 </script>
-    
-
-<a class="button" href="latest/YL_latest.ebk" download>
-下载最新板块文件 (.EBK)
-</a>
-</div>
-
-<div class="card">
-<h2>📚 历史记录</h2>
-<p>
-<a href="history/">查看历史文件</a>
-</p>
-</div>
-
-<div class="card">
-<h2>⚙ 使用说明</h2>
-<p>
-1. 下载 EBK 文件<br>
-2. 打开通达信 → 板块管理 → 导入板块<br>
-3. 选择下载文件即可查看股票池
-</p>
-</div>
-<div class="card">
-<h2>策略逻辑</h2>
-<p>
-游龙掠影基于强势结构突破、量价共振筛选日线级别潜在爆发个股。
-本阶段为测试版本，仅供策略验证。
-</p>
-</div>
-
-    
-<div class="footer">
-© 2026 游龙掠影 · 策略测试阶段
-</div>
-
-</div>
 
 </body>
 </html>
